@@ -65,3 +65,4 @@ seahash = "4.1.0" # derive(PostgresHash)
 serde.workspace = true # impls on pub types
 serde_cbor = "0.11.2" # derive(PostgresType)
 serde_json.workspace = true # everything JSON
+paste = "1.0.14"
