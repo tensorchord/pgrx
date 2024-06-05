@@ -342,7 +342,7 @@ impl PgExtern {
         quote_spanned! { self.func.sig.span() =>
             #[no_mangle]
             #[doc(hidden)]
-            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi)]
+            #[allow(unknown_lints, clippy::no_mangle_with_rust_abi, nonstandard_style)]
             pub extern "Rust" fn  #sql_graph_entity_fn_name() -> ::pgrx::pgrx_sql_entity_graph::SqlGraphEntity {
                 extern crate alloc;
                 #[allow(unused_imports)]
