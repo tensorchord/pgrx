@@ -39,6 +39,7 @@ pub fn finfo_v1_extern_c(
     let tokens = quote_spanned! { original.sig.span() =>
         #[no_mangle]
         #[doc(hidden)]
+        #[allow(unknown_lints, clippy::let_unit_value)]
         #unused_lifetimes
         pub unsafe extern "C" fn #wrapper_symbol #lifetimes(#fcinfo: ::pgrx::pg_sys::FunctionCallInfo) -> ::pgrx::pg_sys::Datum {
             #contents
