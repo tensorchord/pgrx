@@ -17,15 +17,33 @@
 */
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens, TokenStreamExt};
+use syn::Path;
 
 /// A parsed `#[pg_cast]` operator.
 ///
 /// It is created during [`PgExtern`](crate::PgExtern) parsing.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum PgCast {
+    #[default]
     Default,
     Assignment,
     Implicit,
+}
+
+pub type InvalidCastStyle = Path;
+
+impl TryFrom<Path> for PgCast {
+    type Error = InvalidCastStyle;
+
+    fn try_from(path: Path) -> Result<Self, Self::Error> {
+        if path.is_ident("implicit") {
+            Ok(Self::Implicit)
+        } else if path.is_ident("assignment") {
+            Ok(Self::Assignment)
+        } else {
+            Err(path)
+        }
+    }
 }
 
 impl ToTokens for PgCast {

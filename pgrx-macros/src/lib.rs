@@ -163,6 +163,9 @@ By default if no attribute is specified, the cast function can only be used in a
 Functions MUST accept and return exactly one value whose type MUST be a `pgrx` supported type. `pgrx` supports many PostgreSQL types by default.
 New types can be defined via [`macro@PostgresType`] or [`macro@PostgresEnum`].
 
+`#[pg_cast]` also supports all the attributes supported by the [`macro@pg_extern]` macro, which are
+passed down to the underlying function.
+
 Example usage:
 ```rust,ignore
 use pgrx::*;
@@ -173,32 +176,40 @@ fn cast_json_to_int(input: Json) -> i32 { todo!() }
 pub fn pg_cast(attr: TokenStream, item: TokenStream) -> TokenStream {
     fn wrapped(attr: TokenStream, item: TokenStream) -> Result<TokenStream, syn::Error> {
         use syn::parse::Parser;
-        let mut cast = PgCast::Default;
-        match syn::punctuated::Punctuated::<syn::Path, syn::Token![,]>::parse_terminated.parse(attr)
-        {
+        use syn::punctuated::Punctuated;
+
+        let mut cast = None;
+        let mut pg_extern_attrs = proc_macro2::TokenStream::new();
+
+        // look for the attributes `#[pg_cast]` directly understands
+        match Punctuated::<syn::Path, syn::Token![,]>::parse_terminated.parse(attr) {
             Ok(paths) => {
-                if paths.len() > 1 {
-                    panic!(
-                        "pg_cast must take either 0 or 1 attribute. Found {}: {}",
-                        paths.len(),
-                        paths.to_token_stream()
-                    )
-                } else if paths.len() == 1 {
-                    match paths.first().unwrap().segments.last().unwrap().ident.to_string().as_str()
-                    {
-                        "implicit" => cast = PgCast::Implicit,
-                        "assignment" => cast = PgCast::Assignment,
-                        other => panic!("Unrecognized pg_cast option: {other}. "),
+                let mut new_paths = Punctuated::<syn::Path, syn::Token![,]>::new();
+                for path in paths {
+                    match (PgCast::try_from(path), &cast) {
+                        (Ok(style), None) => cast = Some(style),
+                        (Ok(_), Some(cast)) => {
+                            panic!("The cast type has already been set to `{cast:?}`")
+                        }
+
+                        // ... and anything it doesn't understand is blindly passed through to the
+                        // underlying `#[pg_extern]` function that gets created, which will ultimately
+                        // decide what's naughty and what's nice
+                        (Err(unknown), _) => {
+                            new_paths.push(unknown);
+                        }
                     }
                 }
+
+                pg_extern_attrs.extend(new_paths.into_token_stream());
             }
             Err(err) => {
                 panic!("Failed to parse attribute to pg_cast: {err}")
             }
         }
-        // `pg_cast` does not support other `pg_extern` attributes for now, pass an empty attribute token stream.
-        let pg_extern = PgExtern::new(TokenStream::new().into(), item.clone().into())?.0;
-        Ok(CodeEnrichment(pg_extern.as_cast(cast)).to_token_stream().into())
+
+        let pg_extern = PgExtern::new(pg_extern_attrs.into(), item.clone().into())?.0;
+        Ok(CodeEnrichment(pg_extern.as_cast(cast.unwrap_or_default())).to_token_stream().into())
     }
 
     wrapped(attr, item).unwrap_or_else(|e: syn::Error| e.into_compile_error().into())
