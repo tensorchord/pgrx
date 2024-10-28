@@ -143,6 +143,7 @@ impl<'src> Datum<'src> {
     pub fn sans_lifetime(self) -> pg_sys::Datum {
         self.0
     }
+
     /// Construct a Datum containing only a null pointer.
     pub fn null() -> Datum<'src> {
         Self(pg_sys::Datum::from(0), PhantomData)
@@ -154,6 +155,49 @@ impl<'src> Datum<'src> {
     pub unsafe fn borrow_as<T: BorrowDatum>(&self) -> Option<&T> {
         let ptr = ptr::NonNull::new_unchecked(ptr::from_ref(self).cast_mut());
         borrow::datum_ptr_to_bytes::<T>(ptr).map(|ptr| BorrowDatum::borrow_unchecked(ptr))
+    }
+}
+
+/// Represents a typed value as pair of [`Option<Datum>`] and [`Oid`].
+///
+/// [`Oid`]: pg_sys::Oid
+pub struct DatumWithOid<'src> {
+    datum: Option<Datum<'src>>,
+    oid: pg_sys::Oid,
+}
+
+impl<'src> DatumWithOid<'src> {
+    /// Construct a `DatumWithOid` containing the provided value and [`Oid`].
+    ///
+    /// [`Oid`]: pg_sys::Oid
+    pub unsafe fn new<T: IntoDatum>(value: T, oid: pg_sys::Oid) -> Self {
+        Self { datum: value.into_datum().map(|d| Datum(d, PhantomData::default())), oid }
+    }
+
+    /// Construct a `DatumWithOid` containing a null value for type `T`.
+    pub fn null<T: IntoDatum>() -> Self {
+        Self { datum: None, oid: T::type_oid() }
+    }
+
+    /// Returns an [`Option<Datum>`].
+    pub fn datum(&self) -> Option<Datum<'src>> {
+        self.datum.as_ref().map(|d| Datum(d.0, PhantomData::default()))
+    }
+
+    /// Returns an [`Oid`].
+    ///
+    /// [`Oid`]: pg_sys::Oid
+    pub fn oid(&self) -> pg_sys::Oid {
+        self.oid
+    }
+}
+
+impl<'src, T: IntoDatum> From<T> for DatumWithOid<'src> {
+    fn from(value: T) -> Self {
+        unsafe {
+            // SAFETY: The oid is provided by the type.
+            Self::new(value, T::type_oid())
+        }
     }
 }
 
