@@ -21,18 +21,18 @@ if [ -z "${BASE_BRANCH}" ]; then
 	BASE_BRANCH=develop
 fi
 
-git switch ${BASE_BRANCH}
-git fetch origin
+git switch ${BASE_BRANCH} || exit $?
+git fetch origin || exit $?
 git diff origin/${BASE_BRANCH} | if [ "$0" = "" ]; then
     echo "git diff found local changes on ${BASE_BRANCH} branch, cannot cut release."
 elif [ "$NEW_VERSION" = "" ]; then
     echo "No version set. Are you just copying and pasting this without checking?"
 else
-    git pull origin ${BASE_BRANCH} --ff-only
-    git switch -c "prepare-${NEW_VERSION}"
+    git pull origin ${BASE_BRANCH} --ff-only || exit $?
+    git switch -c "prepare-${NEW_VERSION}" || exit $?
 
-    cargo install --path cargo-pgrx --locked
-    cargo pgrx init
+    cargo install --path cargo-pgrx --locked || exit $?
+    cargo pgrx init || exit $?
 
     # exit early if the script fails 
     ./update-versions.sh "${NEW_VERSION}" || exit $?
@@ -41,7 +41,7 @@ else
     # git diff -- . ':(exclude)Cargo.lock'
 
     # send it all to github
-    git commit -a -m "Update version to ${NEW_VERSION}"
-    git push --set-upstream origin "prepare-${NEW_VERSION}"
+    git commit -a -m "Update version to ${NEW_VERSION}" || exit $?
+    git push --set-upstream origin "prepare-${NEW_VERSION}" || exit $?
 fi
 
