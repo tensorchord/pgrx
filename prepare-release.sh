@@ -12,18 +12,23 @@
 
 NEW_VERSION=$1
 if [ -z "${NEW_VERSION}" ]; then
-	echo "Usage: ./prepare-release.sh NEW_VERSION_NUMBER"
+	echo "Usage: ./prepare-release.sh NEW_VERSION_NUMBER [base branch name]"
 	exit 1
 fi
+BASE_BRANCH=$2
+if [ -z "${BASE_BRANCH}" ]; then
+	echo "using develop as the base branch"
+	BASE_BRANCH=develop
+fi
 
-git switch develop
+git switch ${BASE_BRANCH}
 git fetch origin
-git diff origin/develop | if [ "$0" = "" ]; then
-    echo "git diff found local changes on develop branch, cannot cut release."
+git diff origin/${BASE_BRANCH} | if [ "$0" = "" ]; then
+    echo "git diff found local changes on ${BASE_BRANCH} branch, cannot cut release."
 elif [ "$NEW_VERSION" = "" ]; then
     echo "No version set. Are you just copying and pasting this without checking?"
 else
-    git pull origin develop --ff-only
+    git pull origin ${BASE_BRANCH} --ff-only
     git switch -c "prepare-${NEW_VERSION}"
 
     cargo install --path cargo-pgrx --locked
