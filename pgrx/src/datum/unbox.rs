@@ -122,7 +122,10 @@ unsafe impl UnboxDatum for str {
 }
 
 unsafe impl UnboxDatum for &str {
-    type As<'src> = &'src str where Self: 'src;
+    type As<'src>
+        = &'src str
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
@@ -144,7 +147,10 @@ unsafe impl UnboxDatum for CStr {
 }
 
 unsafe impl UnboxDatum for &CStr {
-    type As<'src> = &'src CStr where Self: 'src;
+    type As<'src>
+        = &'src CStr
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
@@ -166,7 +172,10 @@ unsafe impl UnboxDatum for [u8] {
 }
 
 unsafe impl UnboxDatum for &[u8] {
-    type As<'src> = &'src [u8] where Self: 'src;
+    type As<'src>
+        = &'src [u8]
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(datum: Datum<'src>) -> Self::As<'src>
     where
@@ -293,7 +302,10 @@ unbox_with_fromdatum! {
 }
 
 unsafe impl UnboxDatum for PgHeapTuple<'_, crate::AllocatedByRust> {
-    type As<'src> = PgHeapTuple<'src, AllocatedByRust> where Self: 'src;
+    type As<'src>
+        = PgHeapTuple<'src, AllocatedByRust>
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
@@ -304,7 +316,10 @@ unsafe impl UnboxDatum for PgHeapTuple<'_, crate::AllocatedByRust> {
 }
 
 unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for Array<'_, T> {
-    type As<'src> = Array<'src, T> where Self: 'src;
+    type As<'src>
+        = Array<'src, T>
+    where
+        Self: 'src;
     unsafe fn unbox<'src>(d: Datum<'src>) -> Array<'src, T>
     where
         Self: 'src,
@@ -314,7 +329,10 @@ unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for Array<'_, T> {
 }
 
 unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for VariadicArray<'_, T> {
-    type As<'src> = VariadicArray<'src, T> where Self: 'src;
+    type As<'src>
+        = VariadicArray<'src, T>
+    where
+        Self: 'src;
     unsafe fn unbox<'src>(d: Datum<'src>) -> VariadicArray<'src, T>
     where
         Self: 'src,
@@ -324,7 +342,10 @@ unsafe impl<T: FromDatum + UnboxDatum> UnboxDatum for VariadicArray<'_, T> {
 }
 
 unsafe impl<T: FromDatum + UnboxDatum + RangeSubType> UnboxDatum for Range<T> {
-    type As<'src> = Range<T> where Self: 'src;
+    type As<'src>
+        = Range<T>
+    where
+        Self: 'src;
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
         Self: 'src,
@@ -345,7 +366,10 @@ unsafe impl<const P: u32, const S: u32> UnboxDatum for Numeric<P, S> {
 }
 
 unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
-    type As<'src> = PgBox<T> where Self: 'src;
+    type As<'src>
+        = PgBox<T>
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
@@ -356,7 +380,10 @@ unsafe impl<T> UnboxDatum for PgBox<T, AllocatedByPostgres> {
 }
 
 unsafe impl UnboxDatum for Json {
-    type As<'src> = Json where Self: 'src;
+    type As<'src>
+        = Json
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
@@ -367,7 +394,10 @@ unsafe impl UnboxDatum for Json {
 }
 
 unsafe impl UnboxDatum for JsonB {
-    type As<'src> = JsonB where Self: 'src;
+    type As<'src>
+        = JsonB
+    where
+        Self: 'src;
     #[inline]
     unsafe fn unbox<'src>(d: Datum<'src>) -> Self::As<'src>
     where
