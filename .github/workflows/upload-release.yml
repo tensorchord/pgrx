@@ -19,17 +19,17 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
             pkg_fmt: .tar.gz
-            binary_ext: ''
+            binary_ext: ""
           - os: macos-13
             target: x86_64-apple-darwin
             pkg_fmt: .tar.gz
-            binary_ext: ''
+            binary_ext: ""
           - os: macos-14
             target: aarch64-apple-darwin
             pkg_fmt: .tar.gz
-            binary_ext: ''
+            binary_ext: ""
           - os: windows-2022
             target: x86_64-pc-windows-msvc
             pkg_fmt: .zip
@@ -44,7 +44,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          cargo build -p cargo-pgrx --bin cargo-pgrx --target ${{ matrix.target }} --release
+          cargo build -p cargo-pgrx --bin cargo-pgrx --features cargo-edit/vendored-openssl --target ${{ matrix.target }} --release
 
           mkdir -p build
           cp README.md ./build/
