@@ -44,6 +44,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
+          rustup target add ${{ matrix.target }}
           cargo build -p cargo-pgrx --bin cargo-pgrx --features cargo-edit/vendored-openssl --target ${{ matrix.target }} --release
 
           mkdir -p build
