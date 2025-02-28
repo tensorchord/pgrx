@@ -329,6 +329,9 @@ When you exit `psql`, the Postgres instance continues to run in the background.
 
 For Postgres installations which are already on your computer, `cargo pgrx run` will need write permissions to the directories described by `pg_config --pkglibdir` and `pg_config --sharedir`. It's up to you to decide how to make that happen. While a single Postgres installation can be started multiple times on different ports and different data directories, it does not support multiple "extension library directories".
 
+With the `--install-only` option, `pgrx` will compile and install your extension but will skip all subsequent steps. This might be useful if you have an alternative
+testing approach and don't need an interactive shell.
+
 ```console
 $ cargo pgrx run --help
 Compile/install extension to a pgrx-managed Postgres instance and start psql
@@ -349,6 +352,7 @@ Options:
       --no-default-features            Do not activate the `default` feature
   -F, --features <FEATURES>            Space-separated list of features to activate
       --pgcli                          Use an existing `pgcli` on the $PATH [env: PGRX_PGCLI=]
+      --install-only                   Install without running
   -h, --help                           Print help
   -V, --version                        Print version
 ```

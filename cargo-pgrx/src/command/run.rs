@@ -48,6 +48,9 @@ pub(crate) struct Run {
     /// Use an existing `pgcli` on the $PATH.
     #[clap(env = "PGRX_PGCLI", long)]
     pgcli: bool,
+    /// Install without running
+    #[clap(long)]
+    install_only: bool,
 }
 
 impl CommandExecute for Run {
@@ -86,6 +89,7 @@ impl CommandExecute for Run {
             &profile,
             self.pgcli,
             &self.features,
+            self.install_only,
         )
     }
 }
@@ -104,6 +108,7 @@ pub(crate) fn run(
     profile: &CargoProfile,
     pgcli: bool,
     features: &clap_cargo::Features,
+    install_only: bool,
 ) -> eyre::Result<()> {
     // stop postgres
     stop_postgres(pg_config)?;
@@ -119,6 +124,10 @@ pub(crate) fn run(
         None,
         features,
     )?;
+
+    if install_only {
+        return Ok(());
+    }
 
     // restart postgres
     start_postgres(pg_config)?;
