@@ -44534,6 +44534,16 @@ unsafe extern "C" {
         moveto: XLogRecPtr,
         found_consistent_snapshot: *mut bool,
     ) -> XLogRecPtr;
+    pub static mut ParallelApplyMessagePending: sig_atomic_t;
+    pub fn ApplyWorkerMain(main_arg: Datum);
+    pub fn ParallelApplyWorkerMain(main_arg: Datum);
+    pub fn TablesyncWorkerMain(main_arg: Datum);
+    pub fn IsLogicalWorker() -> bool;
+    pub fn IsLogicalParallelApplyWorker() -> bool;
+    pub fn HandleParallelApplyMessageInterrupt();
+    pub fn HandleParallelApplyMessages();
+    pub fn LogicalRepWorkersWakeupAtCommit(subid: Oid);
+    pub fn AtEOXact_LogicalRepWorkers(isCommit: bool);
     pub fn QueryRewrite(parsetree: *mut Query) -> *mut List;
     pub fn AcquireRewriteLocks(parsetree: *mut Query, forExecute: bool, forUpdatePushedDown: bool);
     pub fn build_column_default(rel: Relation, attrno: ::core::ffi::c_int) -> *mut Node;

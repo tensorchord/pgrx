@@ -39256,6 +39256,8 @@ unsafe extern "C" {
         ctx: *mut LogicalDecodingContext,
         origin_id: RepOriginId,
     ) -> bool;
+    pub fn ApplyWorkerMain(main_arg: Datum);
+    pub fn IsLogicalWorker() -> bool;
     pub fn QueryRewrite(parsetree: *mut Query) -> *mut List;
     pub fn AcquireRewriteLocks(parsetree: *mut Query, forExecute: bool, forUpdatePushedDown: bool);
     pub fn build_column_default(rel: Relation, attrno: ::core::ffi::c_int) -> *mut Node;
