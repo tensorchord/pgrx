@@ -19,11 +19,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            target: x86_64-unknown-linux-musl
+            target: x86_64-unknown-linux-gnu
             pkg_fmt: .tar.gz
             binary_ext: ""
           - os: ubuntu-22.04-arm
-            target: aarch64-unknown-linux-musl
+            target: aarch64-unknown-linux-gnu
             pkg_fmt: .tar.gz
             binary_ext: ""
           - os: macos-13
@@ -48,11 +48,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" = "ubuntu-22.04" ] || [ "${{ matrix.os }}" = "ubuntu-22.04-arm" ]; then
-            sudo apt install musl-tools
-            rustup target add ${{ matrix.target }}
-          fi
-          cargo build -p cargo-pgrx --bin cargo-pgrx --features cargo-edit/vendored-openssl --target ${{ matrix.target }} --release
+          cargo build -p cargo-pgrx --bin cargo-pgrx --target ${{ matrix.target }} --release
 
           mkdir -p build
           cp README.md ./build/
